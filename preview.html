@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Misi Ladang – Penjodoh Bilangan</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:linear-gradient(135deg,#dff7d8,#fff3c4);color:#24331f}
+.wrap{max-width:900px;margin:auto;padding:24px}.card{background:white;border-radius:28px;padding:28px;box-shadow:0 8px 25px #0002}
+h1{font-size:38px;margin:0 0 8px;text-align:center}.subtitle{text-align:center;font-size:19px;margin-bottom:22px}
+.top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:18px}.badge{padding:10px 16px;border-radius:18px;background:#eef8e9;font-weight:bold}
+.progress{height:14px;background:#eee;border-radius:20px;overflow:hidden;margin:12px 0 24px}.bar{height:100%;width:0;background:#6aaa45;transition:.3s}
+.mission{font-size:25px;font-weight:bold;margin-bottom:18px}.question{font-size:29px;font-weight:bold;background:#fff8df;padding:22px;border-radius:20px;text-align:center;margin-bottom:18px}
+.options{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}button{border:0;border-radius:18px;padding:17px;font-size:20px;font-weight:bold;cursor:pointer;background:#e7f2ff}
+button:hover{transform:translateY(-2px)}button:disabled{cursor:default;opacity:.8}.feedback{min-height:60px;text-align:center;font-size:21px;font-weight:bold;padding:14px}
+.next{display:block;margin:10px auto 0;background:#6aaa45;color:white}.hidden{display:none}.start{background:#f2c94c;color:#3a2b00}
+.final{text-align:center}.stars{font-size:44px;letter-spacing:5px}.small{font-size:16px;text-align:center;opacity:.75}
+@media(max-width:650px){.options{grid-template-columns:1fr}h1{font-size:30px}.question{font-size:23px}}
+</style></head>
+<body><div class="wrap"><div class="card">
+<h1>🌾 Misi Ladang</h1><div class="subtitle">Jom Takluk Penjodoh Bilangan!</div>
+<div id="start"><p style="font-size:20px;text-align:center">Bekerjasama dengan kumpulan dan pilih penjodoh bilangan yang paling sesuai.</p>
+<button class="start" style="display:block;margin:20px auto" onclick="startGame()">Mula Permainan 🚜</button>
+<p class="small">3 misi • 9 soalan • kumpul bintang ⭐</p></div>
+<div id="game" class="hidden"><div class="top"><div class="badge" id="missionBadge"></div><div class="badge">⭐ Skor: <span id="score">0</span></div></div>
+<div class="progress"><div class="bar" id="bar"></div></div><div class="mission" id="mission"></div><div class="question" id="question"></div>
+<div class="options" id="options"></div><div class="feedback" id="feedback"></div>
+<button id="next" class="next hidden" onclick="nextQuestion()">Soalan Seterusnya ➜</button></div>
+<div id="final" class="final hidden"><h2>🎉 Tahniah!</h2><div class="stars" id="stars"></div><h2 id="result"></h2><p id="message"></p>
+<button class="start" onclick="location.reload()">Main Semula 🔄</button></div>
+</div></div>
+<script>
+const data = [["Misi 1 – Kebun Buah", [["Ibu membeli ___ epal.", ["seekor", "sebiji", "sebatang"], 1, "Sebiji epal"], ["Ayah membeli ___ pisang.", ["setandan", "seekor", "sehelai"], 0, "Setandan pisang"], ["Kakak makan ___ oren.", ["sebiji", "seekor", "sebatang"], 0, "Sebiji oren"]]], ["Misi 2 – Kandang Haiwan", [["Ali melihat ___ ayam.", ["sebiji", "seekor", "setandan"], 1, "Seekor ayam"], ["Pak Abu memelihara ___ lembu.", ["seekor", "sehelai", "sebiji"], 0, "Seekor lembu"], ["Di taman ada ___ burung.", ["sebatang", "seekor", "setandan"], 1, "Seekor burung"]]], ["Misi 3 – Cabaran Ladang", [["Ibu membeli ___ anggur.", ["sebiji", "segugus", "seekor"], 1, "Segugus anggur"], ["Murid melihat ___ lebah.", ["sekawan", "sebiji", "sebatang"], 0, "Sekawan lebah"], ["Datuk membawa ___ jagung.", ["sebatang", "seekor", "sekawan"], 0, "Sebatang jagung"]]]];
+let qIndex=0,score=0,answered=false;
+let flat=[];data.forEach(m=>m[1].forEach(q=>flat.push({mission:m[0],q:q[0],opts:q[1],ans:q[2],explain:q[3]})));
+function startGame(){document.getElementById('start').classList.add('hidden');document.getElementById('game').classList.remove('hidden');showQuestion()}
+function showQuestion(){answered=false;const x=flat[qIndex];document.getElementById('missionBadge').textContent=x.mission;document.getElementById('mission').textContent=x.mission;document.getElementById('question').textContent=x.q;document.getElementById('score').textContent=score;document.getElementById('bar').style.width=(qIndex/flat.length*100)+'%';document.getElementById('feedback').textContent='';document.getElementById('next').classList.add('hidden');const box=document.getElementById('options');box.innerHTML='';x.opts.forEach((o,i)=>{const b=document.createElement('button');b.textContent=o;b.onclick=()=>answer(i,b);box.appendChild(b)})}
+function answer(i,btn){if(answered)return;answered=true;const x=flat[qIndex];document.querySelectorAll('#options button').forEach(b=>b.disabled=true);if(i===x.ans){score++;btn.style.background='#cdecc2';document.getElementById('feedback').textContent='✅ Betul! '+x.explain+'.'}else{btn.style.background='#ffd4d4';document.getElementById('feedback').textContent='💡 Jawapan yang betul ialah: '+x.explain+'.'}document.getElementById('score').textContent=score;document.getElementById('next').classList.remove('hidden')}
+function nextQuestion(){qIndex++;if(qIndex>=flat.length)finish();else showQuestion()}
+function finish(){document.getElementById('game').classList.add('hidden');document.getElementById('final').classList.remove('hidden');const stars=score>=8?'⭐⭐⭐':score>=5?'⭐⭐':'⭐';document.getElementById('stars').textContent=stars;document.getElementById('result').textContent='Skor kamu: '+score+'/9';document.getElementById('message').textContent=score>=8?'Hebat! Kamu sangat mahir menggunakan penjodoh bilangan!':score>=5?'Bagus! Teruskan berlatih supaya lebih yakin.':'Tidak mengapa! Mari berlatih lagi dengan contoh yang mudah.'}
+</script></body></html>
